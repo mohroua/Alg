@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>اختبار بريد الجزائر - مع حساب النتيجة</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+    .question {
+      background-color: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .question h3 {
+      margin: 0 0 10px;
+    }
+    label {
+      display: block;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: green;
+      font-weight: bold;
+    }
+    input[type="number"] {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      width: 200px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>اختبار بريد الجزائر</h2>
+  <div id="quiz"></div>
+  <button onclick="showResult()">عرض النتيجة</button>
+  <div class="result" id="result"></div>
+
+  <h2>حاسبة نتيجة اختبار QSM</h2>
+  <input type="number" id="total" placeholder="عدد الأسئلة الكلي">
+  <input type="number" id="correct" placeholder="عدد الإجابات الصحيحة">
+  <br>
+  <button onclick="calculateQSM()">احسب النتيجة</button>
+  <div class="result" id="output"></div>
+
+  <script>
+    const questions = [
+      { q: "متى تأسس بريد الجزائر؟", options: ["2000", "2002", "1999", "2004"], correct: 1 },
+      { q: "ما هو الرمز البريدي للعاصمة الجزائر؟", options: ["16000", "15000", "13000", "17000"], correct: 0 },
+      { q: "ما اسم البطاقة الذهبية الخاصة ببريد الجزائر؟", options: ["Visa", "MasterCard", "Edahabia", "CIB"], correct: 2 },
+      { q: "من هو المدير الحالي لبريد الجزائر؟", options: ["أحمد بن عيسى", "سميرة لكحل", "عبد الكريم دهيني", "نسرين عفان"], correct: 2 },
+      { q: "ما هي العملة التي يتعامل بها بريد الجزائر؟", options: ["الدينار", "اليورو", "الدولار", "الدرهم"], correct: 0 },
+      { q: "كم عدد الأرقام في رقم الحساب البريدي الجاري؟", options: ["10", "14", "12", "20"], correct: 1 },
+      { q: "هل يمكن سحب الأموال من البطاقة الذهبية عبر الإنترنت؟", options: ["نعم", "لا"], correct: 0 },
+      { q: "ما هو الحد الأقصى للسحب اليومي من الصراف؟", options: ["20000 دج", "30000 دج", "50000 دج", "100000 دج"], correct: 2 }
+    ];
+
+    const quizDiv = document.getElementById("quiz");
+    questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `<h3>س${i+1}: ${q.q}</h3>` + q.options.map((opt, j) => `
+        <label>
+          <input type="radio" name="q${i}" value="${j}"> ${opt}
+        </label>`).join("");
+      quizDiv.appendChild(div);
+    });
+
+    function showResult() {
+      let score = 0;
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const options = document.getElementsByName(`q${i}`);
+
+        options.forEach(opt => {
+          opt.parentElement.style.backgroundColor = "";
+          opt.parentElement.style.fontWeight = "normal";
+        });
+
+        if (selected) {
+          if (parseInt(selected.value) === q.correct) {
+            score++;
+          }
+        }
+
+        options[q.correct].parentElement.style.backgroundColor = "#d4edda";
+        options[q.correct].parentElement.style.fontWeight = "bold";
+
+        if (selected && parseInt(selected.value) !== q.correct) {
+          selected.parentElement.style.backgroundColor = "#f8d7da";
+          selected.parentElement.style.fontWeight = "bold";
+        }
+      });
+
+      document.getElementById("result").innerText = `✔️ نتيجتك: ${score} من ${questions.length}`;
+    }
+
+    function calculateQSM() {
+      const total = parseInt(document.getElementById('total').value);
+      const correct = parseInt(document.getElementById('correct').value);
+      const wrong = total - correct;
+      const score = correct - wrong;
+      const percent = ((score / total) * 100).toFixed(2);
+
+      let message = '';
+      if (score < 0) {
+        message = `❌ النتيجة سالبة (${score})، تم اعتبارها 0.`;
+      } else {
+        message = `✅ نتيجتك: ${score} من ${total} (أي بنسبة ${percent}%)`;
+      }
+
+      document.getElementById('output').innerText = message;
+    }
+  </script>
+</body>
+</html>
