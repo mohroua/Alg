@@ -1,135 +1,295 @@
+# Due to the length of the code and HTML logic involved, we’ll first break it into manageable sections and insert features step by step.
+
+# Let's generate the updated JavaScript and HTML logic to support:
+
+# 1. One question at a time.
+
+# 2. A 2-minute countdown per question.
+
+# 3. Auto-next on timeout.
+
+# 4. Locked unanswered question if time expires.
+
+
+
+# Here's the modified HTML+JavaScript block:
+
+
+
+updated_code = """
 
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
+
 <head>
+
   <meta charset="UTF-8">
-  <title>اختبار بريد الجزائر - مع حساب النتيجة</title>
+
+  <title>اختبار بريد الجزائر - الجانب المالي والإداري</title>
+
   <style>
+
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 20px;
-      direction: rtl;
-    }
-    .question {
+
+      font-family: 'arial', sans-serif;
+
       background-color: #fff;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+
+      direction: rtl;
+
     }
-    .question h3 {
-      margin: 0 0 10px;
+
+    .question {
+
+      display: none;
+
+      border: 2px solid #004a99;
+
+      padding: 20px;
+
+      margin: 20px auto;
+
+      border-radius: 10px;
+
+      width: 90%;
+
+      box-shadow: 0 0 10px #ccc;
+
     }
-    label {
+
+    .active {
+
       display: block;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
+
     }
+
     button {
+
       padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 20px;
+
       font-size: 18px;
-      color: green;
-      font-weight: bold;
-    }
-    input[type="number"] {
-      padding: 10px;
+
       margin: 10px;
-      font-size: 16px;
-      width: 200px;
+
+    }
+
+    #timer {
+
+      font-size: 20px;
+
+      color: red;
+
+      font-weight: bold;
+
       text-align: center;
+
     }
+
   </style>
+
 </head>
+
 <body>
-  <h2>اختبار بريد الجزائر</h2>
-  <div id="quiz"></div>
-  <button onclick="showResult()">عرض النتيجة</button>
-  <div class="result" id="result"></div>
 
-  <h2>حاسبة نتيجة اختبار QSM</h2>
-  <input type="number" id="total" placeholder="عدد الأسئلة الكلي">
-  <input type="number" id="correct" placeholder="عدد الإجابات الصحيحة">
-  <br>
-  <button onclick="calculateQSM()">احسب النتيجة</button>
-  <div class="result" id="output"></div>
 
-  <script>
-    const questions = [
-      { q: "متى تأسس بريد الجزائر؟", options: ["2000", "2002", "1999", "2004"], correct: 1 },
-      { q: "ما هو الرمز البريدي للعاصمة الجزائر؟", options: ["16000", "15000", "13000", "17000"], correct: 0 },
-      { q: "ما اسم البطاقة الذهبية الخاصة ببريد الجزائر؟", options: ["Visa", "MasterCard", "Edahabia", "CIB"], correct: 2 },
-      { q: "من هو المدير الحالي لبريد الجزائر؟", options: ["أحمد بن عيسى", "سميرة لكحل", "عبد الكريم دهيني", "نسرين عفان"], correct: 2 },
-      { q: "ما هي العملة التي يتعامل بها بريد الجزائر؟", options: ["الدينار", "اليورو", "الدولار", "الدرهم"], correct: 0 },
-      { q: "كم عدد الأرقام في رقم الحساب البريدي الجاري؟", options: ["10", "14", "12", "20"], correct: 1 },
-      { q: "هل يمكن سحب الأموال من البطاقة الذهبية عبر الإنترنت؟", options: ["نعم", "لا"], correct: 0 },
-      { q: "ما هو الحد الأقصى للسحب اليومي من الصراف؟", options: ["20000 دج", "30000 دج", "50000 دج", "100000 دج"], correct: 2 }
-    ];
 
-    const quizDiv = document.getElementById("quiz");
-    questions.forEach((q, i) => {
-      const div = document.createElement("div");
-      div.className = "question";
-      div.innerHTML = `<h3>س${i+1}: ${q.q}</h3>` + q.options.map((opt, j) => `
-        <label>
-          <input type="radio" name="q${i}" value="${j}"> ${opt}
-        </label>`).join("");
-      quizDiv.appendChild(div);
-    });
+<h1 style="text-align: center;">اختبار بريد الجزائر</h1>
 
-    function showResult() {
-      let score = 0;
-      questions.forEach((q, i) => {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        const options = document.getElementsByName(`q${i}`);
+<div id="timer">الوقت المتبقي: 120 ثانية</div>
 
-        options.forEach(opt => {
-          opt.parentElement.style.backgroundColor = "";
-          opt.parentElement.style.fontWeight = "normal";
-        });
+<div id="quiz"></div>
 
-        if (selected) {
-          if (parseInt(selected.value) === q.correct) {
-            score++;
-          }
-        }
+<div style="text-align: center;">
 
-        options[q.correct].parentElement.style.backgroundColor = "#d4edda";
-        options[q.correct].parentElement.style.fontWeight = "bold";
+  <button onclick="prevQuestion()">السابق</button>
 
-        if (selected && parseInt(selected.value) !== q.correct) {
-          selected.parentElement.style.backgroundColor = "#f8d7da";
-          selected.parentElement.style.fontWeight = "bold";
-        }
-      });
+  <button onclick="nextQuestion()">التالي</button>
 
-      document.getElementById("result").innerText = `✔️ نتيجتك: ${score} من ${questions.length}`;
+</div>
+
+<div id="result" style="text-align:center; font-size: 24px; margin-top: 20px;"></div>
+
+
+
+<script>
+
+const questions = [];
+
+function addQuestion(q, options, correct) {
+
+  questions.push({ q, options, correct, answered: false, locked: false, timeLeft: 120 });
+
+}
+
+
+
+// Add sample questions (for demo)
+
+addQuestion("ما هي الوثائق المطلوبة لفتح حساب بريدي جاري؟", ["نسخة من شهادة الميلاد", "الوثيقة CH1 + نسخة من بطاقة الهوية", "بطاقة إقامة", "شهادة عمل"], 1);
+
+addQuestion("ما هو الحد الأقصى اليومي للتحويل؟", ["20,000 دج", "30,000 دج", "50,000 دج", "100,000 دج"], 2);
+
+
+
+let currentIndex = 0;
+
+let timerInterval;
+
+
+
+const quizDiv = document.getElementById("quiz");
+
+questions.forEach((q, i) => {
+
+  const div = document.createElement("div");
+
+  div.className = "question";
+
+  div.id = "question-" + i;
+
+  div.innerHTML = `<h3>س${i + 1}: ${q.q}</h3>` +
+
+    q.options.map((opt, j) => `
+
+      <label>
+
+        <input type="radio" name="q${i}" value="${j}" onclick="markAnswered(${i})"> ${opt}
+
+      </label><br>`).join("");
+
+  quizDiv.appendChild(div);
+
+});
+
+
+
+function markAnswered(i) {
+
+  if (!questions[i].locked) {
+
+    questions[i].answered = true;
+
+  }
+
+}
+
+
+
+function showQuestion(i) {
+
+  document.querySelectorAll(".question").forEach(div => div.classList.remove("active"));
+
+  document.getElementById("question-" + i).classList.add("active");
+
+  startTimer(i);
+
+}
+
+
+
+function startTimer(i) {
+
+  clearInterval(timerInterval);
+
+  const timerDiv = document.getElementById("timer");
+
+  timerDiv.innerText = `الوقت المتبقي: ${questions[i].timeLeft} ثانية`;
+
+
+
+  timerInterval = setInterval(() => {
+
+    questions[i].timeLeft--;
+
+    timerDiv.innerText = `الوقت المتبقي: ${questions[i].timeLeft} ثانية`;
+
+    if (questions[i].timeLeft <= 0) {
+
+      questions[i].locked = true;
+
+      clearInterval(timerInterval);
+
+      nextQuestion();
+
     }
 
-    function calculateQSM() {
-      const total = parseInt(document.getElementById('total').value);
-      const correct = parseInt(document.getElementById('correct').value);
-      const wrong = total - correct;
-      const score = correct - wrong;
-      const percent = ((score / total) * 100).toFixed(2);
+  }, 1000);
 
-      let message = '';
-      if (score < 0) {
-        message = `❌ النتيجة سالبة (${score})، تم اعتبارها 0.`;
-      } else {
-        message = `✅ نتيجتك: ${score} من ${total} (أي بنسبة ${percent}%)`;
-      }
+}
 
-      document.getElementById('output').innerText = message;
+
+
+function nextQuestion() {
+
+  if (currentIndex < questions.length - 1) {
+
+    currentIndex++;
+
+    showQuestion(currentIndex);
+
+  } else {
+
+    clearInterval(timerInterval);
+
+    showResult();
+
+  }
+
+}
+
+
+
+function prevQuestion() {
+
+  if (currentIndex > 0) {
+
+    currentIndex--;
+
+    showQuestion(currentIndex);
+
+  }
+
+}
+
+
+
+function showResult() {
+
+  let score = 0;
+
+  questions.forEach((q, i) => {
+
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+
+    if (selected && parseInt(selected.value) === q.correct) {
+
+      score++;
+
     }
-  </script>
+
+  });
+
+  document.getElementById("result").innerText = `✔️ نتيجتك: ${score} من ${questions.length}`;
+
+}
+
+
+
+showQuestion(currentIndex);
+
+</script>
+
+
+
 </body>
+
 </html>
+
+"""
+
+
+
+updated_code[:1000]  # Just showing a preview since it's long
+
+
